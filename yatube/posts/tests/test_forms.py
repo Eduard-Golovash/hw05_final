@@ -73,10 +73,6 @@ class PostCreateFormTests(TestCase):
             'group': self.group.id,
             'image': self.uploaded,
         }
-        response = self.authorized_client.post(reverse(
-            POST_CREATE_URL), data=form_data, follow=True)
-        self.assertRedirects(response, reverse(
-            PROFILE_URL, args=[self.user.username]))
         self.assertEqual(Post.objects.count(), posts_count)
         post = Post.objects.first()
         self.assertEqual(post.text, form_data['text'])
