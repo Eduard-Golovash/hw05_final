@@ -50,20 +50,22 @@ class FollowTest(TestCase):
     def test_following(self):
         """В ленте отображаются посты тех пользователей,
         на которых подписан текущий пользователь"""
-        Post.objects.create(author=self.user1, text=EXAMPLE_TEXT_1)
+        Follow.objects.create(user=self.user, author=self.user1)
         response = self.authorized_client.get(
             reverse('posts:follow_index'), follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(self.post1.author, self.user1)
-        page_obj = response.context.get('page_obj')
-        post = page_obj[0]
-        self.assertContains(post.text, self.post1.text)
-        self.assertNotContains(response, self.post.text)
+        self.assertContains(response, self.post1.text)
 
     def test_not_following(self):
         """В ленте не отображаются посты тех пользователей,
         на которых не подписан текущий пользователь"""
-        response = self.client.get(reverse('posts:follow_index'), follow=True)
+        Follow.objects.all().delete()
+        response = self.authorized_client.get(reverse('posts:follow_index'))
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, self.post.text)
         self.assertNotContains(response, self.post1.text)
+        Follow.objects.create(user=self.user, author=self.user1)
+        response = self.authorized_client.get(reverse('posts:follow_index'), follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.post1.text)

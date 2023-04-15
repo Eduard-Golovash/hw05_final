@@ -95,7 +95,7 @@ class PostCreateFormTests(TestCase):
         response = self.authorized_client.post(reverse(
             POST_EDIT_URL, args=[post.id]), data=post_data)
         self.assertRedirects(response, reverse(
-            POST_DETAIL_URL, args=[post.id]))
+            POST_DETAIL_URL, args=[post.id]), status_code=302)
         edited_post = Post.objects.get(id=post.id)
         self.assertEqual(edited_post.text, post_data['text'])
 
