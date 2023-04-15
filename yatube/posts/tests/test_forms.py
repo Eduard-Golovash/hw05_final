@@ -14,10 +14,8 @@ from posts.tests.constants import (
     EXAMPLE_SLUG,
     EXAMPLE_DESCRIPTION,
     EXAMPLE_TEXT,
-    POST_CREATE_URL,
     POST_EDIT_URL,
     POST_DETAIL_URL,
-    PROFILE_URL
 )
 
 TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
