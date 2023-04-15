@@ -66,6 +66,7 @@ class FollowTest(TestCase):
         self.assertNotContains(response, self.post.text)
         self.assertNotContains(response, self.post1.text)
         Follow.objects.create(user=self.user, author=self.user1)
-        response = self.authorized_client.get(reverse('posts:follow_index'), follow=True)
+        response = self.authorized_client.get(
+            reverse('posts:follow_index'), follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, self.post1.text)
