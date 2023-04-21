@@ -65,12 +65,12 @@ class TestsUrls(TestCase):
             reverse(POST_CREATE_URL): HTTPStatus.OK,
             '/unexisting_page/': HTTPStatus.NOT_FOUND,
             reverse(ADD_COMMENT_URL,
-                    kwargs={'post_id': self.post.id}): HTTPStatus.OK,
+                    kwargs={'post_id': self.post.id}): HTTPStatus.FOUND,
             reverse(FOLLOW_INDEX_URL): HTTPStatus.OK,
             reverse(PROFILE_FOLLOW,
-                    kwargs={'username': EXAMPLE_USERNAME}): HTTPStatus.OK,
+                    kwargs={'username': EXAMPLE_USERNAME}): HTTPStatus.FOUND,
             reverse(PROFILE_UNFOLLOW,
-                    kwargs={'username': EXAMPLE_USERNAME}): HTTPStatus.OK,
+                    kwargs={'username': EXAMPLE_USERNAME}): HTTPStatus.FOUND,
         }
         for url, status_code in urls.items():
             with self.subTest(url=url):
