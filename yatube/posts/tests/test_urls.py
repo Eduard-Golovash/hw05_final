@@ -3,7 +3,7 @@ from http import HTTPStatus
 from django.test import TestCase, Client
 from django.urls import reverse
 
-from posts.models import Group, Post, User
+from posts.models import Group, Post, User, Comment
 from posts.tests.constants import (
     EXAMPLE_SLUG,
     EXAMPLE_USERNAME,
@@ -16,6 +16,10 @@ from posts.tests.constants import (
     POST_DETAIL_URL,
     POST_EDIT_URL,
     POST_CREATE_URL,
+    ADD_COMMENT_URL,
+    FOLLOW_INDEX_URL,
+    PROFILE_FOLLOW,
+    PROFILE_UNFOLLOW,
 )
 
 
@@ -36,6 +40,11 @@ class TestsUrls(TestCase):
             slug=EXAMPLE_SLUG,
             description=EXAMPLE_DESCRIPTION,
         )
+        cls.comment = Comment.objects.create(
+            post=cls.post,
+            author=cls.user,
+            text=EXAMPLE_TEXT,
+        )
 
     def setUp(self):
         self.guest_client = Client()
@@ -55,6 +64,13 @@ class TestsUrls(TestCase):
                     kwargs={'post_id': self.post.id}): HTTPStatus.OK,
             reverse(POST_CREATE_URL): HTTPStatus.OK,
             '/unexisting_page/': HTTPStatus.NOT_FOUND,
+            reverse(ADD_COMMENT_URL,
+                    kwargs={'post_id': self.post.id}): HTTPStatus.OK,
+            reverse(FOLLOW_INDEX_URL): HTTPStatus.OK,
+            reverse(PROFILE_FOLLOW,
+                    kwargs={'username': EXAMPLE_USERNAME}): HTTPStatus.OK,
+            reverse(PROFILE_UNFOLLOW,
+                    kwargs={'username': EXAMPLE_USERNAME}): HTTPStatus.OK,
         }
         for url, status_code in urls.items():
             with self.subTest(url=url):

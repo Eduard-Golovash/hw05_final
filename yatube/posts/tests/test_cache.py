@@ -1,5 +1,3 @@
-from time import sleep
-
 from django.core.cache import cache
 from django.test import TestCase, Client
 from django.urls import reverse
@@ -38,7 +36,7 @@ class CacheTests(TestCase):
         self.assertIsNone(cache.delete(self.cache_key))
         response = self.client.get(reverse(INDEX_URL))
         self.assertContains(response, self.post.text)
-        sleep(20)
+        cache.clear()
         response2 = self.client.get(reverse(INDEX_URL))
         self.assertContains(response2, self.post.text)
         self.assertEqual(response.content, response2.content)

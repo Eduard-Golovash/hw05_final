@@ -11,6 +11,9 @@ from posts.tests.constants import (
     EXAMPLE_USERNAME_1,
     EXAMPLE_TEXT,
     EXAMPLE_TEXT_1,
+    FOLLOW_INDEX_URL,
+    PROFILE_FOLLOW,
+    PROFILE_UNFOLLOW,
 )
 
 
@@ -33,7 +36,7 @@ class FollowTest(TestCase):
     def test_follow(self):
         """Пользователь может подписаться на другого пользователя"""
         response = self.authorized_client.post(reverse(
-            'posts:profile_follow', args=[self.user1.username]))
+            PROFILE_FOLLOW, args=[self.user1.username]))
         self.assertEqual(response.status_code, 302)
         self.assertTrue(Follow.objects.filter(
             user=self.user, author=self.user1).exists())
@@ -42,7 +45,7 @@ class FollowTest(TestCase):
         """Пользователь может отписаться от другого пользователя"""
         Follow.objects.create(user=self.user, author=self.user1)
         response = self.authorized_client.post(reverse(
-            'posts:profile_unfollow', args=[self.user1.username]))
+            PROFILE_UNFOLLOW, args=[self.user1.username]))
         self.assertEqual(response.status_code, 302)
         self.assertFalse(Follow.objects.filter(
             user=self.user, author=self.user1).exists())
@@ -52,7 +55,7 @@ class FollowTest(TestCase):
         на которых подписан текущий пользователь"""
         Follow.objects.create(user=self.user, author=self.user1)
         response = self.authorized_client.get(
-            reverse('posts:follow_index'), follow=True)
+            reverse(FOLLOW_INDEX_URL), follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(self.post1.author, self.user1)
         self.assertContains(response, self.post1.text)
@@ -61,12 +64,12 @@ class FollowTest(TestCase):
         """В ленте не отображаются посты тех пользователей,
         на которых не подписан текущий пользователь"""
         Follow.objects.all().delete()
-        response = self.authorized_client.get(reverse('posts:follow_index'))
+        response = self.authorized_client.get(reverse(FOLLOW_INDEX_URL))
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, self.post.text)
         self.assertNotContains(response, self.post1.text)
         Follow.objects.create(user=self.user, author=self.user1)
         response = self.authorized_client.get(
-            reverse('posts:follow_index'), follow=True)
+            reverse(FOLLOW_INDEX_URL), follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, self.post1.text)

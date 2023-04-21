@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from posts.models import Group, Post, User
+from posts.models import Group, Post, User, Comment
 from posts.tests.constants import (
     EXAMPLE_TITLE,
     EXAMPLE_SLUG,
@@ -22,6 +22,11 @@ class PostModelTest(TestCase):
         cls.post = Post.objects.create(
             author=cls.user,
             text=EXAMPLE_TEXT)
+        cls.comment = Comment.objects.create(
+            post=cls.post,
+            author=cls.user,
+            text=EXAMPLE_TEXT,
+        )
 
     def test_model_post_have_correct_object_names(self):
         """Проверяем, что у модели Post корректно работает __str__."""
@@ -32,3 +37,8 @@ class PostModelTest(TestCase):
         """Проверяем, что у модели Group корректно работает __str__."""
         expected_object_title = self.group.title
         self.assertEqual(expected_object_title, str(self.group))
+
+    def test_model_comment_have_correct_object_names(self):
+        """Проверяем, что у модели Comment корректно работает __str__."""
+        expected_object_text = self.comment.text[:15]
+        self.assertEqual(expected_object_text, str(self.comment))
