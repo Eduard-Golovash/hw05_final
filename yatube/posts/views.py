@@ -10,11 +10,9 @@ from .utils import paginate
 @cache_page(20, key_prefix='index_page')
 def index(request):
     posts = Post.objects.select_related('author', 'group').all()
-    page_number = request.GET.get('page')
-    paginator, page_obj = paginate(posts, page_number)
+    page_obj, page_number = paginate(posts, request.GET.get('page'))
     context = {
         'page_obj': page_obj,
-        'paginator': paginator,
     }
     return render(request, 'posts/index.html', context)
 
@@ -22,8 +20,7 @@ def index(request):
 def group_posts(request, slug):
     group = get_object_or_404(Group, slug=slug)
     posts = group.posts.select_related('author').all()
-    page_number = request.GET.get('page')
-    paginator, page_obj = paginate(posts, page_number)
+    page_obj, page_number = paginate(posts, request.GET.get('page'))
     context = {
         'group': group,
         'page_obj': page_obj,
@@ -33,21 +30,17 @@ def group_posts(request, slug):
 
 def profile(request, username):
     author = get_object_or_404(User, username=username)
-    if request.user == author:
-        posts = author.posts.all().select_related('group',)
-    else:
-        posts = Post.objects.filter(author=author).select_related(
-            'author',
-            'group',)
-    page_number = request.GET.get('page')
-    paginator, page_obj = paginate(posts, page_number)
+    posts = author.posts.all().select_related('group',)
+    page_obj, page_number = paginate(posts, request.GET.get('page'))
+
     context = {
         'author': author,
         'page_obj': page_obj,
-        'following': request.user.is_authenticated and Follow.objects.filter(
-            user=request.user,
-            author=author,
-        ).exists()
+        'following': request.user == author or (
+            request.user.is_authenticated and (
+                Follow.objects.filter(user=request.user, author=author)
+                .exists())
+        )
     }
     return render(request, 'posts/profile.html', context)
 
@@ -114,8 +107,7 @@ def add_comment(request, post_id):
 @login_required
 def follow_index(request):
     post_list = Post.objects.filter(author__following__user=request.user)
-    page_number = request.GET.get('page')
-    paginator, page_obj = paginate(post_list, page_number)
+    page_obj, page_number = paginate(post_list, request.GET.get('page'))
     context = {'page_obj': page_obj}
     return render(request, 'posts/follow.html', context)
 
@@ -130,7 +122,6 @@ def profile_follow(request, username):
 
 @login_required
 def profile_unfollow(request, username):
-    # user_unfollow = get_object_or_404(User, username=username)
     Follow.objects.filter(
         user=request.user, author__username=username).delete()
     return redirect('posts:profile', username=username)

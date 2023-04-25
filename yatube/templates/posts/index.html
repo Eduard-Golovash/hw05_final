@@ -1,7 +1,9 @@
 {% extends 'base.html' %}
 {% block title %}Главная страница{%endblock%}
 {% block content %}
+{% with index=index follow=follow %}
   {% include 'posts/includes/switcher.html' %}
+{% endwith %}
   <div class="container py-5">
     <h1>Последние обновления на сайте.</h1>
       {% for post in page_obj %}
