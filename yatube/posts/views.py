@@ -10,7 +10,7 @@ from .utils import paginate
 @cache_page(20, key_prefix='index_page')
 def index(request):
     posts = Post.objects.select_related('author', 'group').all()
-    page_obj, page_number = paginate(posts, request.GET.get('page'))
+    page_obj = paginate(posts, request.GET.get('page'))
     context = {
         'page_obj': page_obj,
     }
@@ -20,7 +20,7 @@ def index(request):
 def group_posts(request, slug):
     group = get_object_or_404(Group, slug=slug)
     posts = group.posts.select_related('author').all()
-    page_obj, page_number = paginate(posts, request.GET.get('page'))
+    page_obj = paginate(posts, request.GET.get('page'))
     context = {
         'group': group,
         'page_obj': page_obj,
@@ -31,7 +31,7 @@ def group_posts(request, slug):
 def profile(request, username):
     author = get_object_or_404(User, username=username)
     posts = author.posts.all().select_related('group',)
-    page_obj, page_number = paginate(posts, request.GET.get('page'))
+    page_obj = paginate(posts, request.GET.get('page'))
 
     context = {
         'author': author,
@@ -107,7 +107,7 @@ def add_comment(request, post_id):
 @login_required
 def follow_index(request):
     post_list = Post.objects.filter(author__following__user=request.user)
-    page_obj, page_number = paginate(post_list, request.GET.get('page'))
+    page_obj = paginate(post_list, request.GET.get('page'))
     context = {'page_obj': page_obj}
     return render(request, 'posts/follow.html', context)
 
