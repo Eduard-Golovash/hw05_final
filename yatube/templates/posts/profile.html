@@ -48,8 +48,6 @@
       {% endif %}
       {% if not forloop.last %}<hr>{% endif %}
       {% endfor %}
-      <!-- Остальные посты. после последнего нет черты -->
-      <!-- Здесь подключён паджинатор -->
       {% include 'posts/includes/paginator.html' %}
     </div>
   </main>
